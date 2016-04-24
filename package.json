@@ -1,0 +1,32 @@
+{
+  "name": "Attendance",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "angular": "1.5.0",
+    "angular-animate": "^1.5.0",
+    "angular-route": "1.5.0",
+    "angular-smart-table": "2.1.6",
+    "angular-ui-bootstrap": "1.2.1",
+    "bcrypt": "0.8.5",
+    "body-parser": "~1.13.2",
+    "connect-flash": "~0.1.1",
+    "cookie-parser": "~1.3.5",
+    "cron": "^1.1.0",
+    "debug": "~2.2.0",
+    "express": "~4.13.1",
+    "express-session": "~1.13.0",
+    "jade": "~1.11.0",
+    "mongoose": "^4.4.12",
+    "morgan": "~1.6.1",
+    "parseurl": "~1.3.1",
+    "passport": "~0.3.0",
+    "passport-local": "~1.0.0",
+    "respawn": "~2.2.0",
+    "serve-favicon": "~2.3.0",
+    "winston": "~2.1.1"
+  }
+}

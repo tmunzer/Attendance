@@ -1,0 +1,34 @@
+doctype html5
+html
+    head
+        title= title
+        script(language="JavaScript" type="text/javascript" src='/js/jquery-2.1.1.min.js')
+        script(language="JavaScript" type="text/javascript" src='/js/bootstrap.min.js')
+        link(rel='stylesheet' href='/css/bootstrap.min.css')
+        link(rel='stylesheet' href='/css/ah-tm.css')
+        link(rel='stylesheet' href='/css/ah-tm.init.css')
+
+    body
+        div(style="border-top: 2px solid rgb(255 195 15);" class="user-home-wrap")
+            div.clearfix(id='main')
+                div.pt-r
+                    div.grid_20.LoginPage
+                        img(src="/images/Aerohive_Logo_150_white.png" alt="Aerohive" class="ah-logo")
+
+                        div.page-footer
+                            span(style="border: none;") © 2016 Aerohive Networks. All Rights Reserved.
+
+                        div.login-box.grid_9
+                            div.login-box-login
+                                div(class="text-center login-title" style="padding:1em; background-color: rgba(247 247 247 0.97);width:  400px;text-align: center;margin: 50px auto;").box-shadow
+                                    h1 Please Log In
+                                    div.wrong-password.font-aaux
+                                        #message
+                                            if message
+                                                b.text-center.error-message #{message}
+
+                                    div.account-wall
+                                        form(class='form-signin' action='/login/' method='POST')
+                                            input(type='text' name='username' class='form-control' placeholder="E-mail" required autofocus)
+                                            input(type='password' name='password' class='form-control' placeholder="Password" required)
+                                            button.btn.large(type='submit') Log in

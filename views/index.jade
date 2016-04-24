@@ -1,0 +1,106 @@
+extends layout
+block include
+    script(language="JavaScript" type="text/javascript" src='/js/dashboard/init.js')
+
+block content
+    -var waiting = "Requesting data from Aerohive Cloud Service..."
+    article
+        div.entity-timeline-loading
+            div.clearfix
+                div.entity-timeline-column.entity-timeline-choose(style="width: 100%;")
+                    div.clearfix
+                        div.entity-timeline-column
+                            div.entity-timeline-show-label Show
+                        div.entity-timeline-column
+                            div.dropdown
+                                button.dropdown-100(id="timeline-button" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                                    span.init-text(id="span-range") Day
+                                    span.dropdown.caret
+                                ul.dropdown-menu.dropdown-100(aria-labelledby="timeline-button" id="myLoc")
+                                    li(onclick="timelineRange(0, \'Day\')")
+                                        span Day
+                                    li(onclick="timelineRange(1, \'Week\')")
+                                        span Week
+                                    li(onclick="timelineRange(2, \'Month\')")
+                                        span Month
+                                    li(onclick="timelineRange(3, \'Year\')")
+                                        span Year
+                        div.entity-timeline-column
+                            div.entity-timeline-show-range Select Range
+                        div.entity-timeline-column
+                            div.entity-timeline-show-tab.entity-radioset-list
+                                ul(id="timeline-range")
+                                    li.timeline-range(onclick="changeRange('Day', 1)" id="timeline-1") 1H
+                                    li.timeline-range.entity-radioset-cur(onclick="changeRange('Day', 2)" id="timeline-2") 2H
+                                    li.timeline-range(onclick="changeRange('Day', 8)" id="timeline-8") 8H
+                                    li.timeline-range(onclick="changeRange('Day', 0)" id="timeline-0") Last 24H
+                div.clearfix(style="height:200px; min-height: 100px;")
+                    div.entity-timeline-bar-time(id="timeline" )
+    article
+        div(id="entity-timeline-show-time")
+            span='Showing data from '
+            span(id="span-from-date")
+            span=' to '
+            span(id="span-to-date")
+    article
+        div.form-group
+            label.sr-only(for="searchUser") Search User
+            div.input-group
+                div.input-group-addon
+                    i.fa.fa-search
+                input.search.form-control(placeholder="Search User" type="text" id="searchUser")
+        table.table.table-condensed(id="user_list" data-order="[[2, 'desc']]" data-page-length='25')
+            thead
+                tr
+                    th(style="width: 10%;") Status
+                    th(style="width: 20%;") User
+                    th(style="width: 70%;") Connected Clients
+            tbody
+
+
+
+
+block scriptAbove
+    script.
+        var range = 0;
+
+        function timelineRange(id, name) {
+            $("#span-range").html(name);
+            var htmlSrting;
+            switch (name) {
+                case "Day":
+                    range = 0;
+                    htmlSrting =
+                            '<li onclick="changeRange(\'Day\', 1)" id="timeline-1" class="timeline-range">1H</li>' +
+                            '<li onclick="changeRange(\'Day\', 2)" id="timeline-2" class="timeline-range entity-radioset-cur">2H</li>' +
+                            '<li onclick="changeRange(\'Day\', 8)" id="timeline-8" class="timeline-range">8H</li>' +
+                            '<li onclick="changeRange(\'Day\', 0)" id="timeline-0" class="timeline-range">Last 24H</li>';
+                    break;
+                case "Week":
+                    range = 1;
+                    htmlSrting =
+                            '<li onclick="changeRange(\'Week\', 1)" id="timeline-1" class="timeline-range entity-radioset-cur">1D</li>' +
+                            '<li onclick="changeRange(\'Week\', 2)" id="timeline-2" class="timeline-range">2D</li>' +
+                            '<li onclick="changeRange(\'Week\', 0)" id="timeline-0" class="timeline-range">Last 7D</li>';
+                    break;
+                case "Month":
+                    range = 2;
+                    htmlSrting =
+                            '<li onclick="changeRange(\'Month\', 1)" id="timeline-1" class="timeline-range">1D</li>' +
+                            '<li onclick="changeRange(\'Month\', 7)" id="timeline-2" class="timeline-range entity-radioset-cur">7D</li>' +
+                            '<li onclick="changeRange(\'Month\', 14)" id="timeline-14" class="timeline-range">14D</li>' +
+                            '<li onclick="changeRange(\'Month\', 0)" id="timeline-0" class="timeline-range">Last 1M</li>';
+                    break;
+                case "Year":
+                    range = 3;
+                    htmlSrting =
+                            '<li onclick="changeRange(\'Year\', 1)" id="timeline-1" class="timeline-range entity-radioset-cur">1M</li>' +
+                            '<li onclick="changeRange(\'Year\', 2)" id="timeline-2" class="timeline-range">2M</li>' +
+                            '<li onclick="changeRange(\'Year\', 8)" id="timeline-8" class="timeline-range">6M</li>' +
+                            '<li onclick="changeRange(\'Year\', 0)" id="timeline-0" class="timeline-range">Last 12M</li>';
+                    break;
+            }
+            $("#timeline-range").html(htmlSrting);
+            updateTimeline();
+        }
+        init();

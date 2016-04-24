@@ -1,0 +1,81 @@
+-var dashboard = "nav-item"
+-var compare = "nav-item"
+-var details = "nav-item"
+case current_page
+    when "global"
+        - var dashboard = "nav-item cur"
+    when "user"
+        - var compare = "nav-item cur"
+    when "details"
+        - var details = "nav-item cur"
+
+
+doctype html5
+html
+    head
+        title= title
+        script(language="JavaScript" type="text/javascript" src='/js/jquery-2.1.1.min.js')
+        script(language="JavaScript" type="text/javascript" src='/js/highstock.js')
+        link(rel='stylesheet' href='/css/font-awesome.min.css')
+        script(language="JavaScript" type="text/javascript" src='/js/bootstrap.min.js')
+        link(rel='stylesheet' href='/css/bootstrap.min.css')
+        link(rel='stylesheet' href='/css/ah-tm.css')
+        link(rel='stylesheet' href='/css/ah-tm.header.css')
+        link(rel='stylesheet' href='/css/ah-tm.dashboard.css')
+        link(rel='stylesheet' href='/css/borderContainer.css')
+        script(language="JavaScript" type="text/javascript" src='/js/common/timeline.js')
+        script(language="JavaScript" type="text/javascript" src='/js/common/error.js')
+        script(language="JavaScript" type="text/javascript" src='/js/common/charts.js')
+        block include
+
+    body.claro.fullaccess
+        div.modal.fade.bs-example-modal-lg(id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" style="height: 200px;")
+            div.modal-header
+                h4.modal-title(id="modalLabel" style="text-transform: capitalize") Modal title
+            div.modal-body(id="modalBody")
+            div.modal-footer(id="modalFooter" style="position: absolute; bottom: 0px; width: 100%;")
+        div.modal.fade.bs-example-modal-lg(id="modalAD" tabindex="-1" role="dialog" aria-labelledby="modalLabelAD" style="height: 200px;")
+            div.modal-header
+                h4.modal-title(id="modalLabelAD" style="text-transform: capitalize") Account details
+            div.modal-body(id="modalBodyAD")
+                table
+                    tbody
+                        tr
+                            th(style="padding: 5px 10px;") HMNG Server:
+                            td(style="padding: 5px 10px;")= server
+                        tr
+                            th(style="padding: 5px 10px;") Owner ID:
+                            td(style="padding: 5px 10px;")= ownerId
+                        tr
+                            th(style="padding: 5px 10px;") Access Token:
+                            td(style="padding: 5px 10px;")= accessToken
+            div.modal-footer(id="modalFooterAD" style="position: absolute; bottom: 0px; width: 100%;")
+                a(href="javascript:void(0)" class="btn btn-primary" onclick="$('#modalAD').modal('hide')") Close
+        div.header(id="header")
+            div.head-inner
+                h1.logo
+                    img.app-logo(src="/images/logo_nav.png" alt="Aerohive")
+                div.login-area(id="appHeader")
+                    ul.head-nav
+                div.login-area
+                    div.head-options.hdrOptions
+                        div.ah-navsprite-icons
+                            a.tooltips.apollo-right-fixed.apollo-help(style="margin-top: -20px;" href="/help/" target="_blank")
+
+                        div.ah-navsprite-icons.ah-navsprite-user
+                            div.head-sta-item.sta-user.hdrUser
+                                div.sta-item-con
+                                    div.sta-item-con-arrow
+                                    ul.user-list
+                                        li.user-list-item-first(onclick="$('#modalAD').modal()") Account Details
+                                        li
+                                            a(href="/logout/") Logout
+                                span.sta-item-bridge
+
+        div.clearfix(id="main")
+            section
+                block content
+
+        block scriptAbove
+
+        block scriptBelow

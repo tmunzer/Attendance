@@ -1,0 +1,83 @@
+/*============================================== /
+/ ================== HEADER ==================== /
+/ ============================================== */
+#header {
+    background-color: #2C3E50;
+    font-family: "Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
+    min-width: 1220px;
+}
+/*============================================== /
+/ ================== TOP HEADER ================ /
+/ ============================================== */
+.head-inner {
+    width: 1220px;
+    height: 80px;
+    margin: 0 auto;
+    position: relative;
+}
+/* =================LOGO======================= */
+.head-inner > .logo {
+    margin: 0;
+}
+.logo {
+    width: 220px;
+    float: left;
+}
+.app-logo {
+    cursor: pointer;
+    margin: 13px 40px 15px 0;
+    padding: 0;
+}
+/* =================MENU======================= */
+.login-area {
+    float: left;
+    position: relative;
+    width: 1000px;
+    z-index: 948;
+}
+.head-nav {
+    float: left;
+    opacity: 1;
+    filter: alpha(opacity=100);
+    -webkit-transition: opacity 1s ease;
+    transition: opacity 1s ease;
+}
+.nav-item {
+    float: left;
+}
+.cur a, .nav-item a:hover {
+    text-decoration: none;
+    background-color: #f7f7f7;
+    color: #231f20;
+}
+.nav-item a {
+    float: left;
+    padding: 37px 24px 33px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 13px;
+    background-color: #2C3E50;
+    color: #fff;
+    line-height: 10px;
+    letter-spacing: .02em;
+}
+.nav-item a:link {
+    color: #2C3E50;
+}
+.hdrOptions {
+    margin-top: 27px;
+    position: absolute;
+    right: 0;
+}
+
+/*============================================== /
+/ =============== BOTTOM HEADER ================ /
+/ ============================================== */
+.head-bottom .sub-tabs {
+    height: 45px;
+    width: 1220px;
+    margin: 0 auto;
+    position: relative;
+    background-color: #f7f7f7;
+    border-radius: 10px 10px 0 0;
+}
