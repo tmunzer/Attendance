@@ -7,7 +7,7 @@ var events = require('events');
 
 
 
-module.exports = function (vpcUrl, accessToken, ownerId) {
+module.exports = function () {
     var eventEmitter = new events.EventEmitter();
     var acsClients = [];
     var date = new Date();

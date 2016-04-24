@@ -8,20 +8,20 @@ function updateTimeline() {
     switch (range){
         case 0:
             startTime.setDate(startTime.getDate() - 1);
-            selectedRange = 24;
-            step = 24;
+            selectedRange = 120;
+            step = 60;
             format = '{value:%H:%M}';
             break;
         case 1:
             startTime.setDate(startTime.getDate() - 7);
-            selectedRange = 24;
+            selectedRange = 6 * 24;
             step = 24;
             format = '{value:%Y-%m-%d}';
             break;
         case 2:
             startTime.setMonth(startTime.getMonth() - 1);
-            selectedRange = 7;
-            step = 7;
+            selectedRange = 7 * 24;
+            step = 24;
             format = '{value:%Y-%m-%d}';
             break;
         case 3:
@@ -113,7 +113,7 @@ function updateTimeline() {
                         xAxis: {
                             tickPosition: "outside",
                             range: selectedRange,
-                            tickInterval: step,
+
                             categories: time,
                             labels: {
                                 y: 15,
@@ -157,9 +157,9 @@ function updateTimeline() {
 function changeRange(period, range){
     var step, chart;
     //set the step depending on the graph range
-    if (period == "Day")  step = 12;
-    else if (period == "Week") step = 24;
-    else if (period == "Month") step = 1;
+    if (period == "Day")  step = 60;
+    else if (period == "Week") step = 6 * 24;
+    else if (period == "Month") step = 7 * 24;
     else if (period == "Year") step = 30;
     //change the selected button
     $(".timeline-range").removeClass("entity-radioset-cur");

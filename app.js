@@ -5,11 +5,11 @@ global.appRoot = path.resolve(__dirname);
 
 //===============MONGODB=================
 var mongoose = require('mongoose');
-global. db = mongoose.connection;
+global.db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  // Create your schemas and models here.
+db.once('open', function () {
+    // Create your schemas and models here.
 });
 
 mongoose.connect('mongodb://localhost/attendance2');
@@ -30,7 +30,7 @@ app.set('view engine', 'jade');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -38,42 +38,42 @@ app.use(express.static(path.join(__dirname, 'public')));
 var winston = require('winston');
 winston.emitErrs = true;
 global.logger = new winston.Logger({
-  transports: [
-    new winston.transports.File({
-      level: 'info',
-      filename: __dirname + '/logs/all-logs.log',
-      handleExceptions: true,
-      json: true,
-      maxsize: 5242880, //5MB
-      maxFiles: 5,
-      colorize: false
-    }),
-    new winston.transports.Console({
-      level: 'debug',
-      handleExceptions: true,
-      json: false,
-      colorize: true
-    })
-  ],
-  exitOnError: false
+    transports: [
+        new winston.transports.File({
+            level: 'info',
+            filename: __dirname + '/logs/all-logs.log',
+            handleExceptions: true,
+            json: true,
+            maxsize: 5242880, //5MB
+            maxFiles: 5,
+            colorize: false
+        }),
+        new winston.transports.Console({
+            level: 'debug',
+            handleExceptions: true,
+            json: false,
+            colorize: true
+        })
+    ],
+    exitOnError: false
 });
 
 logger.stream = {
-  write: function(message, encoding){
-    logger.info(message);
-  }
+    write: function (message, encoding) {
+        logger.info(message);
+    }
 };
 
 logger.debug("Overriding 'Express' logger");
-app.use(require('morgan')("dev", { "stream": logger.stream }));
+app.use(require('morgan')("dev", {"stream": logger.stream}));
 
 //===============PASSPORT=================
 global.passport = require('passport');
 var expressSession = require('express-session');
 app.use(expressSession({
-  secret: 'mySecretKey',
-  resave: false,
-  saveUninitialized: false
+    secret: 'mySecretKey',
+    resave: false,
+    saveUninitialized: false
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -88,14 +88,14 @@ var initPassport = require(appRoot + '/passport/init');
 initPassport(passport);
 
 //===============ROUTES=================
-app.all('*', function(req,res,next){
-  if (req.path === '/logout/' || req.path === '/login/') return next();
-  // if user is authenticated in the session, call the next() to call the next request handler
-  // Passport adds this method to request object. A middleware is allowed to add properties to
-  // request and response objects
-  else if (req.isAuthenticated()) return next();
-  // if the user is not authenticated then redirect him to the login page
-  else return res.redirect('/login/');
+app.all('*', function (req, res, next) {
+    if (req.path === '/logout/' || req.path === '/login/') return next();
+    // if user is authenticated in the session, call the next() to call the next request handler
+    // Passport adds this method to request object. A middleware is allowed to add properties to
+    // request and response objects
+    else if (req.isAuthenticated()) return next();
+    // if the user is not authenticated then redirect him to the login page
+    else return res.redirect('/login/');
 });
 var login = require('./routes/login');
 app.use('/', login);
@@ -105,10 +105,10 @@ var api = require('./routes/api');
 app.use('/api/', api);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+app.use(function (req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
 // error handlers
@@ -116,39 +116,39 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
+    app.use(function (err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err
+        });
     });
-  });
 }
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
+app.use(function (err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+        message: err.message,
+        error: {}
+    });
 });
 
 //===============CREATE CRON=================
+
 var CronJob = require("cron").CronJob;
 var getAcsData = require(appRoot + "/bin/acs");
 try {
-  new CronJob({
-    cronTime: "0 */1 * * * *",
-    onTick: function () {
-      //getAcsData("cloud-va.aerohive.com", "9gcnyNHOas2tLFYngACJrrMqJpt6z7s84da1e1e9", "1198");
-      getAcsData("cloud-va.aerohive.com", "myfwyoc9tqlm0p3rYz9xvBHJ9Aui1lOS4da1e1e9", "1265");
-    },
-    start: true
-  });
-}catch(ex) {
-  logger.warn("cron pattern not valid");
+    new CronJob({
+        cronTime: "0 */1 * * * *",
+        onTick: function () {
+            getAcsData();
+        },
+        start: true
+    });
+} catch (ex) {
+    logger.warn("cron pattern not valid");
 }
 
 module.exports = app;
