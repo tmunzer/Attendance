@@ -12,7 +12,7 @@ db.once('open', function() {
   // Create your schemas and models here.
 });
 
-mongoose.connect('mongodb://localhost/attendance');
+mongoose.connect('mongodb://localhost/attendance2');
 
 //===============DEPENDENCIES=================
 var express = require('express');
@@ -65,7 +65,7 @@ logger.stream = {
 };
 
 logger.debug("Overriding 'Express' logger");
-app.use(require('morgan')("default", { "stream": logger.stream }));
+app.use(require('morgan')("dev", { "stream": logger.stream }));
 
 //===============PASSPORT=================
 global.passport = require('passport');
@@ -142,7 +142,8 @@ try {
   new CronJob({
     cronTime: "0 */1 * * * *",
     onTick: function () {
-      getAcsData("cloud-va.aerohive.com", "9gcnyNHOas2tLFYngACJrrMqJpt6z7s84da1e1e9", "1198");
+      //getAcsData("cloud-va.aerohive.com", "9gcnyNHOas2tLFYngACJrrMqJpt6z7s84da1e1e9", "1198");
+      getAcsData("cloud-va.aerohive.com", "myfwyoc9tqlm0p3rYz9xvBHJ9Aui1lOS4da1e1e9", "1265");
     },
     start: true
   });

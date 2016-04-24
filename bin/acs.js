@@ -51,7 +51,7 @@ module.exports = function (vpcUrl, accessToken, ownerId) {
                         });
                     }
                 });
-            }
+            } else eventEmitter.emit("parseFinished", index);
         })
         .on("parseClient", function (index, acsClient, user) {
             var client = undefined;
