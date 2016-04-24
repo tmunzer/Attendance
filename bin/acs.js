@@ -32,6 +32,7 @@ module.exports = function (vpcUrl, accessToken, ownerId) {
 
     eventEmitter
         .on("parseUser", function (index, acsClient) {
+            if (acsClient.username){
             User
                 .findOne({"userName": acsClient.userName})
                 .populate("client_ids")
@@ -50,6 +51,7 @@ module.exports = function (vpcUrl, accessToken, ownerId) {
                         });
                     }
                 });
+            }
         })
         .on("parseClient", function (index, acsClient, user) {
             var client = undefined;
