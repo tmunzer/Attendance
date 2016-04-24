@@ -32,7 +32,7 @@ module.exports = function (vpcUrl, accessToken, ownerId) {
 
     eventEmitter
         .on("parseUser", function (index, acsClient) {
-            if (acsClient.username){
+            if (acsClient.userName){
             User
                 .findOne({"userName": acsClient.userName})
                 .populate("client_ids")
