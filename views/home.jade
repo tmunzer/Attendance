@@ -1,11 +1,12 @@
 extends layout
 block include
-    script(language="JavaScript" type="text/javascript" src='/js/dashboard/home.js')
+    script(language="JavaScript" type="text/javascript" src='/js/home/init.js')
+    script(language="JavaScript" type="text/javascript" src='/js/home/timeline.js')
 
 block content
     -var waiting = "Requesting data from Aerohive Cloud Service..."
     article
-        a(href="/index/") Home
+        a(href="#") Home
     article
         div.entity-timeline-loading
             div.clearfix

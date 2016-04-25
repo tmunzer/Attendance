@@ -34,7 +34,7 @@ function updateTimeline() {
     timelineReq = new Date().getTime();
     $.ajax({
         method: 'POST',
-        url: '/api/timeline/all',
+        url: '/api/home/timeline',
         data: {
             startTime: startTime.toISOString(),
             endTime: endTime.toISOString(),

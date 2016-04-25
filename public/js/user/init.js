@@ -1,9 +1,89 @@
 function init() {
+    getClients();
     updateTimeline();
 }
 
 function updateCharts() {
+    getSessions();
+}
 
+function getSessions(){
+    var chart = $('#timeline').highcharts();
+    var endTime = chart.xAxis[1].categories[max];
+    var startTime = chart.xAxis[1].categories[min];
+
+    showLoading("tableSessions");
+    $("#sessions_list tbody").empty();
+
+    var reqId = new Date().getTime();
+
+    $.ajax({
+        method: "POST",
+        url: "/api/user/" + userId + "/sessions",
+        data: {
+            startTime: startTime.toISOString(),
+            endTime: endTime.toISOString(),
+            reqId: reqId
+        }
+    }).done(function(data){
+        if (data.error) displayModal("API", data.error);
+        else {
+            showData("tableSessions");
+            var htmlString;
+            data.sessions.forEach(function (session) {
+                htmlString =
+                    '<tr class="session">' +
+                    '<td class="hostName">' + session.client_id.hostName + '</td>' +
+                    '<td class="macAddress">' + session.client_id.macAddress + '</td>' +
+                    '<td>' + session.start + '</td>' +
+                    '<td>' + session.end + '</td>' +
+                    '<td>' + "N/A" + '</td>' +
+                    '<td class="device">' + session.device_id + '</td>' +
+                    '<td class="location">' + "N/A" + '</td>' +
+                    '<td class="ssid">' + session.ssid + '</td>' +
+                    '<td class="userProfile">' + session.userProfile + '</td>' +
+                    '<td class="vlan">' + session.vlan + '</td>' +
+                    '<td class="ipAddress">' + session.ipAddress + '</td>' +
+                    '<td>' + session.usage + '</td>';
+
+                $("#sessions_list > tbody:last-child").append(htmlString);
+            });
+            $("#filterSession").on("keyup", function() {
+                var value = $(this).val();
+
+                $("#sessions_list tbody tr.session").each(function(index) {
+
+                    var $row = $(this);
+
+                    var hostName = $row.find("td.userName").text();
+                    var macAddress = $row.find("td.macAddress").text();
+                    var device = $row.find("td.device").text();
+                    var location = $row.find("td.location").text();
+                    var ssid = $row.find("td.ssid").text();
+                    var userProfile = $row.find("td.userProfile").text();
+                    var vlan = $row.find("td.vlan").text();
+                    var ipAddress = $row.find("td.ipAddress").text();
+
+
+                    if (hostName.indexOf(value) >= 0) $(this).show();
+                    else if (macAddress.indexOf(value) >= 0) $(this).show();
+                    else if (device.indexOf(value) >= 0) $(this).show();
+                    else if (location.indexOf(value) >= 0) $(this).show();
+                    else if (ssid.indexOf(value) >= 0) $(this).show();
+                    else if (userProfile.indexOf(value) >= 0) $(this).show();
+                    else if (vlan.indexOf(value) >= 0) $(this).show();
+                    else if (ipAddress.indexOf(value) >= 0) $(this).show();
+                    else $(this).hide();
+                });
+            });
+        }
+    });
+}
+
+
+
+
+function getClients(){
     showLoading("tableClients");
 
     var reqId = new Date().getTime();
@@ -18,7 +98,7 @@ function updateCharts() {
         var htmlString, client;
         if (data.error) displayModal("API", data.error);
         else {
-            $('#userName').text(data.user.userName);
+            $('.userName').text(data.user.userName);
             htmlString =
                 "<table class='table table-condensed' id='clients'>" +
                 "<thead>" +

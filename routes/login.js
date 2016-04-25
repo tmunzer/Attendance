@@ -9,7 +9,7 @@ router.get('/login/', function (req, res, next) {
 });
 /* Handle Login POST */
 router.post('/login/', passport.authenticate('login', {
-    successRedirect: '/index/',
+    successRedirect: '/home/',
     failureRedirect: '/login/',
     failureFlash : true
 }));

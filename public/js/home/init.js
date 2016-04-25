@@ -15,7 +15,7 @@ function updateCharts() {
         var reqId = new Date().getTime();
         $.ajax({
             method: 'POST',
-            url: '/api/user/list',
+            url: '/api/home/users',
             data: {
                 startTime: startTime.toISOString(),
                 endTime: endTime.toISOString(),
@@ -111,7 +111,6 @@ function updateCharts() {
                         "</td>" +
                         "</tr>";
                     $("#user_list > tbody:last-child").append(htmlString);
-                    console.log(data.users[key]);
                 }
 
             }

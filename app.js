@@ -99,8 +99,8 @@ app.all('*', function (req, res, next) {
 });
 var login = require('./routes/login');
 app.use('/', login);
-var index = require('./routes/index');
-app.use('/index/', index);
+var index = require('./routes/home');
+app.use('/home/', index);
 var user = require('./routes/user');
 app.use('/user/', user);
 var api = require('./routes/api');

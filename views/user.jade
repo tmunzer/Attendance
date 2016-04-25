@@ -2,17 +2,19 @@ extends layout
 
 
 block include
-    script(language="JavaScript" type="text/javascript" src='/js/dashboard/user.js')
+    script(language="JavaScript" type="text/javascript" src='/js/user/init.js')
+    script(language="JavaScript" type="text/javascript" src='/js/user/timeline.js')
 
 block content
     -var waiting = "Requesting data from Aerohive Cloud Service..."
     article
-        a(href="/index/") Home
+        a(href="/home/") Home
         span(style="margin: auto 5px;") >
         a(href="#") User
-
+        h2(class="userName")
     article
-        h2(id="userName")
+        h4= "Device(s) used by user "
+            span(class="userName")
         div(id="tableClients")
             div(id="tableClientsLoading" style="display:none")
                 div.entity-loading
@@ -59,19 +61,35 @@ block content
             span=' to '
             span(id="span-to-date")
     article
-        div.form-group
-            label.sr-only(for="searchUser") Search User
-            div.input-group
-                div.input-group-addon
-                    i.fa.fa-search
-                input.search.form-control(placeholder="Search User" type="text" id="searchUser")
-        table.table.table-condensed(id="user_list" data-order="[[2, 'desc']]" data-page-length='25')
-            thead
-                tr
-                    th(style="width: 10%;") Status
-                    th(style="width: 20%;") User
-                    th(style="width: 70%;") Connected Clients
-            tbody
+        div(id="tableSessions")
+            div(id="tableSessionsLoading" style="display:none")
+                div.entity-loading
+            div(id="tableSessionsEmpty")
+                div(style="text-align: center; line-height: 250px;")= waiting
+            div(id="tableSessionsData" style="display:none")
+                div.form-group
+                    label.sr-only(for="filterSession") Filter (Hostname, Mac Address, Access Point, Location, SSID, User Profile, VLAN, Ip Address)
+                    div.input-group
+                        div.input-group-addon
+                            i.fa.fa-search
+                        input.search.form-control(placeholder="Filter (Hostname, Mac Address, Access Point, Location, SSID, User Profile, VLAN, Ip Address)" type="text" id="filterSession")
+                table.table.table-condensed(id="sessions_list" data-order="[[2, 'desc']]" data-page-length='25')
+                    thead
+                        tr
+                            th(style="width: 10%;") Client HostName
+                            th(style="width: 10%;") Client Mac Address
+                            th(style="width: 12%;") Session Start
+                            th(style="width: 12%;") Session End
+                            th(style="width: 8%;") Duration
+                            th(style="width: 8%;") Access Point
+                            th(style="width: 8%;") Location
+                            th(style="width: 8%;") SSID
+                            th(style="width: 8%;") User Profile
+                            th(style="width: 5%;") VLAN
+                            th(style="width: 5%;") IP Address
+                            th(style="width: 6%;") Data Usage
+                    tbody
+
                 block scriptAbove
     script.
         var userId = window.location.href.split("/")[4];

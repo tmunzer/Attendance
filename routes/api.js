@@ -18,8 +18,10 @@ router.param("userId", function (req, res, next, userId) {
         })
 });
 
-
-router.post("/timeline/all", function (req, res, next) {
+/* ======================================================================
+ ============================ HOME ======================================
+ ====================================================================== */
+router.post("/home/timeline", function (req, res, next) {
     var startTime = new Date(req.body.startTime);
     var endTime = new Date(req.body.endTime);
     var reqId = req.body.reqId;
@@ -57,7 +59,7 @@ router.post("/timeline/all", function (req, res, next) {
         startTime = new Date(startTime.getTime() + timeUnit);
     }
 });
-router.post("/user/list", function (req, res, next) {
+router.post("/home/users", function (req, res, next) {
     var startTime = new Date(req.body.startTime);
     var endTime = new Date(req.body.endTime);
     var reqId = req.body.reqId;
@@ -66,7 +68,7 @@ router.post("/user/list", function (req, res, next) {
     var turns = -1;
     var ee = new events.EventEmitter();
     ACS.monitor.clients(vpcUrl, accessToken, ownerId, function (err, acsData) {
-        if (err) res.json(err);
+        if (err) res.json({error: err});
         else {
             Session
                 .find({
@@ -126,17 +128,18 @@ router.post("/user/list", function (req, res, next) {
     })
 });
 
+/* ======================================================================
+ ============================ USER ======================================
+ ====================================================================== */
 
 router.post("/user/:userId/clients", function (req, res, next) {
     var user = req.userFromDb.toObject();
     ACS.monitor.clients(vpcUrl, accessToken, ownerId, function (err, acsData) {
-        if (err) res.json(err);
+        if (err) res.json({error: err});
         else {
             acsData.forEach(function (acs) {
                 for (var i = 0; i < user.client_ids.length; i++) {
                     if (acs.clientId == user.client_ids[i].acsId) {
-                        console.log("=================");
-                        console.log(user.client_ids[i]);
                         user.client_ids[i].status =
                         {
                             "clientHealth": acs.clientHealth,
@@ -144,8 +147,6 @@ router.post("/user/:userId/clients", function (req, res, next) {
                             "networkHealth": acs.networkHealth,
                             "radioHealth": acs.radioHealth
                         };
-                        console.log("=================");
-                        console.log(user.client_ids[i]);
                     }
                 }
             });
@@ -158,5 +159,79 @@ router.post("/user/:userId/clients", function (req, res, next) {
             res.json({user: user});
         }
     })
+});
+router.post("/user/:userId/timeline", function (req, res, next) {
+    var startTime = new Date(req.body.startTime);
+    var endTime = new Date(req.body.endTime);
+    var user = req.userFromDb;
+    var reqId = req.body.reqId;
+    var duration = endTime - startTime;
+    var timeUnit;
+    var deviceCount = [];
+    var i = 0;
+    var done = 0;
+    var turns = 0;
+    // set the TimeUnit depending on the duration to fit the ACS API constraints
+    if (duration <= 86400000) timeUnit = 1 * 60 * 1000; // when day > 1 minute
+    else if (duration <= 604800000) timeUnit = 10 * 60 * 1000; // when week > 10 minutes
+    else if (duration <= 2674800000) timeUnit = 1 * 60 * 60 * 1000; // when month > 1 hour
+    else timeUnit = 8 * 60 * 60 * 1000; // else > 8 hours
+    turns = parseInt((duration / timeUnit).toFixed(0));
+    while (startTime <= endTime) {
+        Session.distinct("user_id", {
+            $and: [
+                {user_id: user._id},
+                {start: {$lte: new Date(startTime.getTime() + timeUnit)}},
+                {
+                    $or: [
+                        {end: 0},
+                        {end: {$gte: startTime}}
+                    ]
+                }
+            ]
+        })
+            .exec(function (err, data) {
+                done++;
+                if (err) logger.error(err);
+                else deviceCount[this.i] = {time: this.time, userCount: data.length};
+                if (done == turns + 1) res.json({data: deviceCount, reqId: reqId});
+            }.bind({i: i, time: startTime}));
+        i++;
+        startTime = new Date(startTime.getTime() + timeUnit);
+    }
+});
+
+
+router.post("/user/:userId/sessions", function (req, res, next) {
+    var startTime = new Date(req.body.startTime);
+    var endTime = new Date(req.body.endTime);
+    var reqId = req.body.reqId;
+    var user = req.userFromDb;
+    console.log(user);
+    Session
+        .find({
+            $and: [
+                {user_id: user._id},
+                {start: {$lt: endTime}},
+                {
+                    $or: [
+                        {end: 0},
+                        {end: {$gt: startTime}}
+                    ]
+                }]
+        })
+        .populate("client_id")
+        .exec(function (err, sessions) {
+            if (err) res.json({error: err});
+            else {
+                sessions.forEach(function (session) {
+                    session.client_id.hostName = session.client_id.hostNameAnonymized;
+                    session.client_id.macAddress = session.client_id.macAddressAnonymized;
+                });
+                console.log(sessions);
+                res.json({sessions: sessions, reqId: reqId});
+            }
+        });
+
 });
 module.exports = router;
