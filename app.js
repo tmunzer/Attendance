@@ -101,6 +101,8 @@ var login = require('./routes/login');
 app.use('/', login);
 var index = require('./routes/index');
 app.use('/index/', index);
+var user = require('./routes/user');
+app.use('/user/', user);
 var api = require('./routes/api');
 app.use('/api/', api);
 

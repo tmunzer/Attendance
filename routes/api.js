@@ -6,6 +6,19 @@ var Session = require(appRoot + "/bin/models/acsSession");
 var Client = require(appRoot + "/bin/models/acsClient");
 var events = require('events');
 
+router.param("userId", function (req, res, next, userId) {
+    User.findOne({_id: userId})
+        .populate("client_ids")
+        .exec(function (err, user) {
+            if (err) return next();
+            else {
+                req.userFromDb = user;
+                return next();
+            }
+        })
+});
+
+
 router.post("/timeline/all", function (req, res, next) {
     var startTime = new Date(req.body.startTime);
     var endTime = new Date(req.body.endTime);
@@ -29,7 +42,7 @@ router.post("/timeline/all", function (req, res, next) {
                 {
                     $or: [
                         {end: 0},
-                        {end: {$gte: startTime }}
+                        {end: {$gte: startTime}}
                     ]
                 }
             ]
@@ -38,7 +51,7 @@ router.post("/timeline/all", function (req, res, next) {
                 done++;
                 if (err) logger.error(err);
                 else userCount[this.i] = {time: this.time, userCount: data.length};
-                if (done == turns+1) res.json({data: userCount, reqId: reqId});
+                if (done == turns + 1) res.json({data: userCount, reqId: reqId});
             }.bind({i: i, time: startTime}));
         i++;
         startTime = new Date(startTime.getTime() + timeUnit);
@@ -52,7 +65,7 @@ router.post("/user/list", function (req, res, next) {
     var done = 0;
     var turns = -1;
     var ee = new events.EventEmitter();
-    ACS.monitor.clients(vpcUrl, accessToken, ownerId, function(err, acsData){
+    ACS.monitor.clients(vpcUrl, accessToken, ownerId, function (err, acsData) {
         if (err) res.json(err);
         else {
             Session
@@ -68,11 +81,11 @@ router.post("/user/list", function (req, res, next) {
                 })
                 .exec(function (err, sessions) {
                     turns = sessions.length * 2;
-                    sessions.forEach(function(session){
+                    sessions.forEach(function (session) {
                         if (users.hasOwnProperty(session.user_id)) ee.emit("done");
                         else {
                             users[session.user_id] = {userName: "", clients: {}};
-                            User.findOne({_id: session.user_id}, function(err, user){
+                            User.findOne({_id: session.user_id}, function (err, user) {
                                 users[this.user_id].userName = user.userNameAnonymized;
                                 for (var i = 0; i < acsData.length; i++) {
                                     if (acsData[i].userName == user.userName) users[this.user_id].status = true;
@@ -84,12 +97,12 @@ router.post("/user/list", function (req, res, next) {
                         if (users[session.user_id].hasOwnProperty(session.client_id)) ee.emit("done");
                         else {
                             users[session.user_id].clients[session.client_id] = {hostName: "", os: "", macAddress: ""};
-                            Client.findOne({_id: session.client_id}, function(err, client){
+                            Client.findOne({_id: session.client_id}, function (err, client) {
                                 users[this.user_id].clients[this.client_id].hostName = client.hostNameAnonymized;
                                 users[this.user_id].clients[this.client_id].os = client.os;
                                 users[this.user_id].clients[this.client_id].macAddress = client.macAddressAnonymized;
                                 for (var i = 0; i < acsData.length; i++) {
-                                    if (acsData[i].hostName == client.hostName)
+                                    if (acsData[i].clientId == client.acsId)
                                         users[this.user_id].clients[this.client_id].status = {
                                             "clientHealth": acsData[i].clientHealth,
                                             "applicationHealth": acsData[i].applicationHealth,
@@ -105,10 +118,44 @@ router.post("/user/list", function (req, res, next) {
         }
     });
 
-    ee.on("done", function(){
-        done ++;
+    ee.on("done", function () {
+        done++;
         if (done == turns) {
             res.json({users: users, reqId: reqId});
+        }
+    })
+});
+
+
+router.post("/user/:userId/clients", function (req, res, next) {
+    var user = req.userFromDb.toObject();
+    ACS.monitor.clients(vpcUrl, accessToken, ownerId, function (err, acsData) {
+        if (err) res.json(err);
+        else {
+            acsData.forEach(function (acs) {
+                for (var i = 0; i < user.client_ids.length; i++) {
+                    if (acs.clientId == user.client_ids[i].acsId) {
+                        console.log("=================");
+                        console.log(user.client_ids[i]);
+                        user.client_ids[i].status =
+                        {
+                            "clientHealth": acs.clientHealth,
+                            "applicationHealth": acs.applicationHealth,
+                            "networkHealth": acs.networkHealth,
+                            "radioHealth": acs.radioHealth
+                        };
+                        console.log("=================");
+                        console.log(user.client_ids[i]);
+                    }
+                }
+            });
+            user.userName = user.userNameAnonymized;
+            user.client_ids.forEach(function (client) {
+                client.hostName = client.hostNameAnonymized;
+                client.macAddress = client.macAddressAnonymized;
+            });
+            console.log(user);
+            res.json({user: user});
         }
     })
 });

@@ -1,11 +1,25 @@
 extends layout
+
+
 block include
-    script(language="JavaScript" type="text/javascript" src='/js/dashboard/home.js')
+    script(language="JavaScript" type="text/javascript" src='/js/dashboard/user.js')
 
 block content
     -var waiting = "Requesting data from Aerohive Cloud Service..."
     article
         a(href="/index/") Home
+        span(style="margin: auto 5px;") >
+        a(href="#") User
+
+    article
+        h2(id="userName")
+        div(id="tableClients")
+            div(id="tableClientsLoading" style="display:none")
+                div.entity-loading
+            div(id="tableClientsEmpty")
+                div(style="text-align: center; line-height: 250px;")= waiting
+            div(id="tableClientsData" style="display:none")
+
     article
         div.entity-timeline-loading
             div.clearfix
@@ -58,14 +72,10 @@ block content
                     th(style="width: 20%;") User
                     th(style="width: 70%;") Connected Clients
             tbody
-
-
-
-
-block scriptAbove
+                block scriptAbove
     script.
+        var userId = window.location.href.split("/")[4];
         var range = 0;
-
         function timelineRange(id, name) {
             $("#span-range").html(name);
             var htmlSrting;

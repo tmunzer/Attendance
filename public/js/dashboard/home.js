@@ -30,7 +30,7 @@ function updateCharts() {
                 for (var key in data.users){
                     user = data.users[key];
                     htmlString =
-                        "<tr>";
+                        "<tr class='user'>";
                     if (user.status)
                         htmlString +=
                             '<td>' +
@@ -128,9 +128,9 @@ function updateCharts() {
     $("#searchUser").on("keyup", function() {
         var value = $(this).val();
 
-        $("table tbody tr").each(function(index) {
+        $("table tbody tr.user").each(function(index) {
 
-                $row = $(this);
+                var $row = $(this);
 
                 var userName = $row.find("td.userName > a").text();
 

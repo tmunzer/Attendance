@@ -34,7 +34,6 @@ var Login = mongoose.model('Login', LoginSchema);
 Login.newLogin = function(email, password, callback){
     this.findOne({email: email})
         .exec(function(err, user){
-        console.log(user);
         if (err) callback(err, null);
         else if  (!user) callback(null, false);
         else if (user.enabled && bCrypt.compareSync(password, user.password)){ //cryptPassword(password) == user.password){

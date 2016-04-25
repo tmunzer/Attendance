@@ -1,10 +1,14 @@
 var express = require('express');
 var router = express.Router();
-/* GET home page. */
-router.get('/', function (req, res, next) {
-    console.log(req.user);
-    res.render('user', {title: 'Attendance'});
+var ACS = require(appRoot + "/bin/aerohive/api/main");
+var User = require(appRoot + "/bin/models/acsUser");
+var Session = require(appRoot + "/bin/models/acsSession");
+var Client = require(appRoot + "/bin/models/acsClient");
+var events = require('events');
 
+
+router.get('/:userId', function (req, res, next) {
+    res.render('user', {title: 'Attendance'});
 });
 
 module.exports = router;
