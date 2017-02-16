@@ -1,0 +1,12 @@
+module.exports.mongoConfig = {
+    host: "mongo",
+    base: "attendance"
+}
+module.exports.redirectUrl = "https://attendance.ah-lab.fr/conf/api/reg";
+module.exports.secret = "d82af59f72d4700787958ce976955bc7";
+module.exports.clientId = "4da1e1e9";
+
+global.vpcUrl = "cloud-va.aerohive.com";
+global.accessToken = "myfwyoc9tqlm0p3rYz9xvBHJ9Aui1lOS4da1e1e9";
+global.ownerId = "1265";
+//getAcsData("cloud-va.aerohive.com", "9gcnyNHOas2tLFYngACJrrMqJpt6z7s84da1e1e9", "1198");

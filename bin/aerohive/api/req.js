@@ -1,5 +1,5 @@
 var https = require('https');
-var ApiConf = require(appRoot + "/bin/aerohive/config");
+var ApiConf = require(appRoot + "/config");
 
 
 module.exports.apiRequest = function (vpcUrl, accessToken, path, callback) {
