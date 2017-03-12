@@ -21,4 +21,8 @@ router.get('/logout/', function(req, res) {
     req.session.destroy();
     res.redirect('/login/');
 });
+
+router.get("/", function(req, res){
+    res.redirect("/home");
+})
 module.exports = router;
