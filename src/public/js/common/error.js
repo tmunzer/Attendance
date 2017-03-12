@@ -1,6 +1,6 @@
 function displayModal(errorSource, error){
-    console.log(errorSource);
-    console.log(error);
+    console.error("\x1b[31mERROR\x1b[0m:",errorSource);
+    console.error("\x1b[31mERROR\x1b[0m:",error);
     var title, body, footer;
     switch (errorSource){
         case "API":

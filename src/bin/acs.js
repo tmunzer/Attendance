@@ -12,45 +12,45 @@ module.exports = function () {
     var acsClients = [];
     var date = new Date();
     var done = 0;
-    console.log("---- Init ACS open turn : process started ---- " + date);
-    Session.find({end: 0}, function (err, sessions) {
+    console.info("\x1b[32minfo\x1b[0m:", "---- Init ACS open turn : process started ---- " + date);
+    Session.find({ end: 0 }, function (err, sessions) {
         sessions.forEach(function (session) {
-            session.update({updated: false}, function (err) {
+            session.update({ updated: false }, function (err) {
                 done++;
-                if (err) console.error("Unable to update session " + session._id);
+                if (err) console.error("\x1b[31mERROR\x1b[0m:", "Unable to update session " + session._id);
                 if (done == sessions.length) console.log("---- Init ACS open turn : process ended ----");
             });
         })
     });
     ACS.monitor.clients(vpcUrl, accessToken, ownerId, function (err, data) {
-        if (err) console.error(err);
+        if (err) console.error("\x1b[31mERROR\x1b[0m:", err);
         else if (data) {
             acsClients = data;
             eventEmitter.emit("parseUser", 0, acsClients[0]);
-        } else console.error("no data");
+        } else console.error("\x1b[31mERROR\x1b[0m:", "no data");
     });
 
     eventEmitter
         .on("parseUser", function (index, acsClient) {
-            if (acsClient.userName){
-            User
-                .findOne({"userName": acsClient.userName})
-                .populate("client_ids")
-                .exec(function (err, user) {
-                    if (err) console.error(err);
-                    else if (user) {
-                        eventEmitter.emit("parseClient", index, acsClient, user);
-                    } else {
-                        console.info("New User: " + acsClient.userName);
-                        User({
-                            userName: acsClient.userName,
-                            userNameAnonymized: acsClient.userName
-                        }).save(function (err, user) {
-                            if (err) console.log(err);
+            if (acsClient.userName) {
+                User
+                    .findOne({ "userName": acsClient.userName })
+                    .populate("client_ids")
+                    .exec(function (err, user) {
+                        if (err) console.error("\x1b[31mERROR\x1b[0m:", err);
+                        else if (user) {
                             eventEmitter.emit("parseClient", index, acsClient, user);
-                        });
-                    }
-                });
+                        } else {
+                            console.info("\x1b[32minfo\x1b[0m:", "New User: " + acsClient.userName);
+                            User({
+                                userName: acsClient.userName,
+                                userNameAnonymized: acsClient.userName
+                            }).save(function (err, user) {
+                                if (err) console.error("\x1b[31mERROR\x1b[0m:", err);
+                                eventEmitter.emit("parseClient", index, acsClient, user);
+                            });
+                        }
+                    });
             } else eventEmitter.emit("parseFinished", index);
         })
         .on("parseClient", function (index, acsClient, user) {
@@ -64,7 +64,7 @@ module.exports = function () {
                 eventEmitter.emit("parseSession", index, acsClient, user, client);
             }
             else {
-                console.info("New Device: " + acsClient.hostName + " - " + acsClient.clientMac);
+                console.info("\x1b[32minfo\x1b[0m:", "New Device: " + acsClient.hostName + " - " + acsClient.clientMac);
                 Client.create({
                     acsId: acsClient.clientId,
                     user_id: user._id,
@@ -74,7 +74,7 @@ module.exports = function () {
                     macAddress: acsClient.clientMac,
                     macAddressAnonymized: acsClient.clientMac
                 }, function (err, client) {
-                    if (err) console.error(err);
+                    if (err) console.error("\x1b[31mERROR\x1b[0m:", err);
                     user.client_ids.push(client._id);
                     user.save();
                     eventEmitter.emit("parseSession", index, acsClient, user, client);
@@ -84,9 +84,9 @@ module.exports = function () {
 
         .on("parseSession", function (index, acsClient, user, client) {
             Session
-                .findOne({user_id: user._id, client_id: client._id, end: new Date(0)})
+                .findOne({ user_id: user._id, client_id: client._id, end: new Date(0) })
                 .exec(function (err, session) {
-                    if(err) console.error(err);
+                    if (err) console.error("\x1b[31mERROR\x1b[0m:", err);
                     else {
                         if (session) {
                             session.update({
@@ -100,12 +100,12 @@ module.exports = function () {
                                 networkHealth: acsClient.networkHealth,
                                 radioHealth: acsClient.radioHealth
                             }, function (err) {
-                                if (err) console.error("Unable to update session " + session._id);
+                                if (err) console.error("\x1b[31mERROR\x1b[0m:", "Unable to update session " + session._id);
                                 eventEmitter.emit("parseFinished", index);
                             });
                         }
                         else {
-                            console.info("New Session: " + acsClient.ssid + " - " + acsClient.ip);
+                            console.info("\x1b[32minfo\x1b[0m:", "New Session: " + acsClient.ssid + " - " + acsClient.ip);
                             Session.create({
                                 user_id: user._id,
                                 client_id: client._id,
@@ -123,7 +123,7 @@ module.exports = function () {
                                 radioHealth: acsClient.radioHealth,
                                 updated: true
                             }, function (err, session) {
-                                if (err) console.error(err);
+                                if (err) console.error("\x1b[31mERROR\x1b[0m:", err);
                                 else {
                                     client.session_ids.push(session._id);
                                     client.save();
@@ -139,18 +139,18 @@ module.exports = function () {
             index++;
             if (index == acsClients.length) {
                 var done = 0;
-                console.log("---- Init ACS close turn : process started ----");
-                Session.find({end: 0, updated: false}, function (err, sessions) {
-                    if (err) console.error(err);
+                console.info("\x1b[32minfo\x1b[0m:", "---- Init ACS close turn : process started ----");
+                Session.find({ end: 0, updated: false }, function (err, sessions) {
+                    if (err) console.error("\x1b[31mERROR\x1b[0m:", err);
                     else {
-                    sessions.forEach(function (session) {
-                        console.log("Session ended: IP " + session.ipAddress + " on SSID " + session.ssid);
-                        session.update({end: new Date().getTime()}, function(err){
-                            if (err) console.error("Unable to update session " + session._id);
+                        sessions.forEach(function (session) {
+                            console.info("\x1b[32minfo\x1b[0m:", "Session ended: IP " + session.ipAddress + " on SSID " + session.ssid);
+                            session.update({ end: new Date().getTime() }, function (err) {
+                                if (err) console.error("\x1b[31mERROR\x1b[0m:", "Unable to update session " + session._id);
+                            });
+                            done++;
                         });
-                        done++;
-                    });
-                    console.log("---- Init ACS close turn : process ended ----" + date);
+                        console.info("\x1b[32minfo\x1b[0m:", "---- Init ACS close turn : process ended ----" + date);
                     }
                 })
             } else eventEmitter.emit("parseUser", index, acsClients[index]);

@@ -154,8 +154,7 @@ router.post("/user/:userId/clients", function (req, res, next) {
             user.client_ids.forEach(function (client) {
                 client.hostName = client.hostNameAnonymized;
                 client.macAddress = client.macAddressAnonymized;
-            });
-            console.log(user);
+            });            
             res.json({user: user});
         }
     })
@@ -207,7 +206,6 @@ router.post("/user/:userId/sessions", function (req, res, next) {
     var endTime = new Date(req.body.endTime);
     var reqId = req.body.reqId;
     var user = req.userFromDb;
-    console.log(user);
     Session
         .find({
             $and: [
@@ -228,7 +226,6 @@ router.post("/user/:userId/sessions", function (req, res, next) {
                     session.client_id.hostName = session.client_id.hostNameAnonymized;
                     session.client_id.macAddress = session.client_id.macAddressAnonymized;
                 });
-                console.log(sessions);
                 res.json({sessions: sessions, reqId: reqId});
             }
         });
