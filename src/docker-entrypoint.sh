@@ -1,6 +1,5 @@
 #!/bin/sh
-cd /app
-npm install
+
 cd /app/bin
 if [ "$1" ]
 then
