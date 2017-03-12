@@ -1,6 +1,6 @@
 FROM node:6-wheezy
-LABEL fr.ah-lab.analytics.version="0.0.3"
-LABEL fr.ah-lab.analytics.release-date="2017-03-11"
+LABEL fr.ah-lab.attendance.version="0.0.3"
+LABEL fr.ah-lab.attendance.release-date="2017-03-11"
 
 RUN npm install -g bower
 
