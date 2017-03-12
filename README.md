@@ -26,7 +26,7 @@ If you want to use OAuth authentication, the application will need to use HTTPS.
 * Start the APP with `www_with_https`. 
 
 ### Docker Image
-You can easily deploy this application with [Docker](https://www.docker.com/). The image is publicly available on Docker Hub at https://hub.docker.com/r/tmunzer/api-test-tool/.
+You can easily deploy this application with [Docker](https://www.docker.com/). The image is publicly available on Docker Hub at https://hub.docker.com/r/tmunzer/attendance/.
 In this case, you can choose to manually deploy the image and create the container, or you can use the automation script (for Linux).
 
 #### Automation Script
@@ -35,7 +35,7 @@ The Automation script will allow you to easily
 * Manage HTTPS certificates with self-signed certificates or with let's encrypt image (the script will automatically download and deploy the let's encrypt container if needed)
 * Download and Deploy dependencies, like NGINX container
 * Download, Deploy, Update the application container
-To use this script, just download it [here](https://github.com/tmunzer/api-test-tool/releases/download/1.0/api-test-tool.sh), and run it in a terminal.
+To use this script, just download it [here](https://github.com/tmunzer/attendance/releases/download/1.0/attendance.sh), and run it in a terminal.
 
 **WARNING:**
 Currently, this application requires some customization of the configuration file.
@@ -44,4 +44,4 @@ Please check the [config_example.js](https://github.com/tmunzer/Attendance/blob/
 #### Manual deployment
 If you are manually deploying this container, you will need to a reverse proxy to manage HTTPS.
 
-`docker create -v <path_to_config.js>/config.js:/app/config.js:ro --name="<container_name>" -p 51362:80 tmunzer/api-test-tool`
+`docker create -v <path_to_config.js>/config.js:/app/config.js:ro --link <mongoDB_container_name>:mongo --name="<container_name>" -p 51368:80 tmunzer/attendance`
