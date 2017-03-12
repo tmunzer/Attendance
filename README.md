@@ -37,6 +37,10 @@ The Automation script will allow you to easily
 * Download, Deploy, Update the application container
 To use this script, just download it [here](https://github.com/tmunzer/api-test-tool/releases/download/1.0/api-test-tool.sh), and run it in a terminal.
 
+**WARNING:**
+Currently, this application requires some customization of the configuration file.
+Please check the [config_example.js](https://github.com/tmunzer/Attendance/blob/master/src/config_example.js) file to get more details.
+
 #### Manual deployment
 If you are manually deploying this container, you will need to a reverse proxy to manage HTTPS.
 
