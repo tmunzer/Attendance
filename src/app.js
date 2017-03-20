@@ -2,23 +2,24 @@
 var path = require('path');
 global.appRoot = path.resolve(__dirname);
 
-
-//===============MONGODB=================
-var mongoose = require('mongoose');
-var mongoConfig = require('./config').mongoConfig
-global.db = mongoose.connection;
-
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function () {
-    // Create your schemas and models here.
-});
-
-mongoose.connect('mongodb://'+ mongoConfig.host +'/' + mongoConfig.base);
-//===============DEPENDENCIES=================
 var express = require('express');
 var favicon = require('serve-favicon');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+var morgan = require('morgan')
+//===============MONGODB=================
+
+var mongoConfig = require('./config').mongoConfig
+global.db = mongoose.connection;
+
+
+db.on('error', console.error.bind(console, '\x1b[31mERROR\x1b[0m: unable to connect to mongoDB on ' + mongoConfig.host + ' server'));
+db.once('open', function () {
+  console.info("\x1b[32minfo\x1b[0m:", "Connected to mongoDB on " + mongoConfig.host + " server");
+});
+
+mongoose.connect('mongodb://'+ mongoConfig.host +'/' + mongoConfig.base);
 
 //===============CREATE APP=================
 var app = express();
@@ -35,45 +36,26 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //=============CREATE LOGGER===============
-var winston = require('winston');
-winston.emitErrs = true;
-global.logger = new winston.Logger({
-    transports: [
-        new winston.transports.File({
-            level: 'info',
-            filename: __dirname + '/logs/all-logs.log',
-            handleExceptions: true,
-            json: true,
-            maxsize: 5242880, //5MB
-            maxFiles: 5,
-            colorize: false
-        }),
-        new winston.transports.Console({
-            level: 'debug',
-            handleExceptions: true,
-            json: false,
-            colorize: true
-        })
-    ],
-    exitOnError: false
-});
 
-logger.stream = {
-    write: function (message, encoding) {
-        logger.info(message);
-    }
-};
-
-logger.debug("Overriding 'Express' logger");
-app.use(require('morgan')("dev", {"stream": logger.stream}));
+app.use(morgan('\x1b[32minfo\x1b[0m: :remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length]', {
+  skip: function (req, res) { return res.statusCode < 400 && req.url != "/" && req.originalUrl.indexOf("/api") < 0 }
+}));
 
 //===============PASSPORT=================
 global.passport = require('passport');
 var expressSession = require('express-session');
+var MongoDBStore = require('connect-mongodb-session')(expressSession);
 app.use(expressSession({
-    secret: 'mySecretKey',
-    resave: false,
-    saveUninitialized: false
+    secret: 'JkSwjJcqnfJ6NAzi9fjsTWfKLgRm',
+    resave: true,
+    store: new MongoDBStore({
+      uri: 'mongodb://' + mongoConfig.host + '/express-session',
+      collection: 'attendance'
+    }),
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 30 * 60 * 1000 // 30 minutes
+    }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -107,10 +89,10 @@ var api = require('./routes/api');
 app.use('/api/', api);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
+app.use(function(req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
 });
 
 // error handlers
@@ -118,23 +100,24 @@ app.use(function (req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-    app.use(function (err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
+  app.use(function (err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+      message: err.message,
+      error: err
     });
+  });
 }
-
 // production error handler
 // no stacktraces leaked to user
 app.use(function (err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
+  if (err.status == 404) err.message = "The requested url "+req.originalUrl+" was not found on this server.";
+  res.status(err.status || 500);
+  res.render('error', {
+    status: err.status,
+    message: err.message,
+    error: {}
+  });
 });
 
 //===============CREATE CRON=================
@@ -150,7 +133,7 @@ try {
         start: true
     });
 } catch (ex) {
-    logger.warn("cron pattern not valid");
+    console.error("\x1b[31mERROR\x1b[0m:", "cron pattern not valid");
 }
 
 module.exports = app;

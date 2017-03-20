@@ -7,7 +7,7 @@ var Client = require(appRoot + "/bin/models/acsClient");
 var events = require('events');
 
 router.param("userId", function (req, res, next, userId) {
-    User.findOne({_id: userId})
+    User.findOne({ _id: userId })
         .populate("client_ids")
         .exec(function (err, user) {
             if (err) return next();
@@ -40,21 +40,21 @@ router.post("/home/timeline", function (req, res, next) {
     while (startTime <= endTime) {
         Session.distinct("user_id", {
             $and: [
-                {start: {$lte: new Date(startTime.getTime() + timeUnit)}},
+                { start: { $lte: new Date(startTime.getTime() + timeUnit) } },
                 {
                     $or: [
-                        {end: 0},
-                        {end: {$gte: startTime}}
+                        { end: 0 },
+                        { end: { $gte: startTime } }
                     ]
                 }
             ]
         })
             .exec(function (err, data) {
                 done++;
-                if (err) logger.error(err);
-                else userCount[this.i] = {time: this.time, userCount: data.length};
-                if (done == turns + 1) res.json({data: userCount, reqId: reqId});
-            }.bind({i: i, time: startTime}));
+                if (err) console.error("\x1b[31mERROR\x1b[0m:", err);
+                else userCount[this.i] = { time: this.time, userCount: data.length };
+                if (done == turns + 1) res.json({ data: userCount, reqId: reqId });
+            }.bind({ i: i, time: startTime }));
         i++;
         startTime = new Date(startTime.getTime() + timeUnit);
     }
@@ -68,16 +68,16 @@ router.post("/home/users", function (req, res, next) {
     var turns = -1;
     var ee = new events.EventEmitter();
     ACS.monitor.clients(vpcUrl, accessToken, ownerId, function (err, acsData) {
-        if (err) res.json({error: err});
+        if (err) res.json({ error: err });
         else {
             Session
                 .find({
                     $and: [
-                        {start: {$lt: endTime}},
+                        { start: { $lt: endTime } },
                         {
                             $or: [
-                                {end: 0},
-                                {end: {$gt: startTime}}
+                                { end: 0 },
+                                { end: { $gt: startTime } }
                             ]
                         }]
                 })
@@ -86,20 +86,20 @@ router.post("/home/users", function (req, res, next) {
                     sessions.forEach(function (session) {
                         if (users.hasOwnProperty(session.user_id)) ee.emit("done");
                         else {
-                            users[session.user_id] = {userName: "", clients: {}};
-                            User.findOne({_id: session.user_id}, function (err, user) {
+                            users[session.user_id] = { userName: "", clients: {} };
+                            User.findOne({ _id: session.user_id }, function (err, user) {
                                 users[this.user_id].userName = user.userNameAnonymized;
                                 for (var i = 0; i < acsData.length; i++) {
                                     if (acsData[i].userName == user.userName) users[this.user_id].status = true;
                                 }
                                 ee.emit("done")
-                            }.bind({user_id: session.user_id}));
+                            }.bind({ user_id: session.user_id }));
 
                         }
                         if (users[session.user_id].hasOwnProperty(session.client_id)) ee.emit("done");
                         else {
-                            users[session.user_id].clients[session.client_id] = {hostName: "", os: "", macAddress: ""};
-                            Client.findOne({_id: session.client_id}, function (err, client) {
+                            users[session.user_id].clients[session.client_id] = { hostName: "", os: "", macAddress: "" };
+                            Client.findOne({ _id: session.client_id }, function (err, client) {
                                 users[this.user_id].clients[this.client_id].hostName = client.hostNameAnonymized;
                                 users[this.user_id].clients[this.client_id].os = client.os;
                                 users[this.user_id].clients[this.client_id].macAddress = client.macAddressAnonymized;
@@ -113,7 +113,7 @@ router.post("/home/users", function (req, res, next) {
                                         };
                                 }
                                 ee.emit("done")
-                            }.bind({user_id: session.user_id, client_id: session.client_id}));
+                            }.bind({ user_id: session.user_id, client_id: session.client_id }));
                         }
                     })
                 });
@@ -123,7 +123,7 @@ router.post("/home/users", function (req, res, next) {
     ee.on("done", function () {
         done++;
         if (done == turns) {
-            res.json({users: users, reqId: reqId});
+            res.json({ users: users, reqId: reqId });
         }
     })
 });
@@ -135,18 +135,18 @@ router.post("/home/users", function (req, res, next) {
 router.post("/user/:userId/clients", function (req, res, next) {
     var user = req.userFromDb.toObject();
     ACS.monitor.clients(vpcUrl, accessToken, ownerId, function (err, acsData) {
-        if (err) res.json({error: err});
+        if (err) res.json({ error: err });
         else {
             acsData.forEach(function (acs) {
                 for (var i = 0; i < user.client_ids.length; i++) {
                     if (acs.clientId == user.client_ids[i].acsId) {
                         user.client_ids[i].status =
-                        {
-                            "clientHealth": acs.clientHealth,
-                            "applicationHealth": acs.applicationHealth,
-                            "networkHealth": acs.networkHealth,
-                            "radioHealth": acs.radioHealth
-                        };
+                            {
+                                "clientHealth": acs.clientHealth,
+                                "applicationHealth": acs.applicationHealth,
+                                "networkHealth": acs.networkHealth,
+                                "radioHealth": acs.radioHealth
+                            };
                     }
                 }
             });
@@ -154,8 +154,8 @@ router.post("/user/:userId/clients", function (req, res, next) {
             user.client_ids.forEach(function (client) {
                 client.hostName = client.hostNameAnonymized;
                 client.macAddress = client.macAddressAnonymized;
-            });            
-            res.json({user: user});
+            });
+            res.json({ user: user });
         }
     })
 });
@@ -179,22 +179,22 @@ router.post("/user/:userId/timeline", function (req, res, next) {
     while (startTime <= endTime) {
         Session.distinct("user_id", {
             $and: [
-                {user_id: user._id},
-                {start: {$lte: new Date(startTime.getTime() + timeUnit)}},
+                { user_id: user._id },
+                { start: { $lte: new Date(startTime.getTime() + timeUnit) } },
                 {
                     $or: [
-                        {end: 0},
-                        {end: {$gte: startTime}}
+                        { end: 0 },
+                        { end: { $gte: startTime } }
                     ]
                 }
             ]
         })
             .exec(function (err, data) {
                 done++;
-                if (err) logger.error(err);
-                else deviceCount[this.i] = {time: this.time, userCount: data.length};
-                if (done == turns + 1) res.json({data: deviceCount, reqId: reqId});
-            }.bind({i: i, time: startTime}));
+                if (err) console.error("\x1b[31mERROR\x1b[0m:", err);
+                else deviceCount[this.i] = { time: this.time, userCount: data.length };
+                if (done == turns + 1) res.json({ data: deviceCount, reqId: reqId });
+            }.bind({ i: i, time: startTime }));
         i++;
         startTime = new Date(startTime.getTime() + timeUnit);
     }
@@ -209,24 +209,24 @@ router.post("/user/:userId/sessions", function (req, res, next) {
     Session
         .find({
             $and: [
-                {user_id: user._id},
-                {start: {$lt: endTime}},
+                { user_id: user._id },
+                { start: { $lt: endTime } },
                 {
                     $or: [
-                        {end: 0},
-                        {end: {$gt: startTime}}
+                        { end: 0 },
+                        { end: { $gt: startTime } }
                     ]
                 }]
         })
         .populate("client_id")
         .exec(function (err, sessions) {
-            if (err) res.json({error: err});
+            if (err) res.json({ error: err });
             else {
                 sessions.forEach(function (session) {
                     session.client_id.hostName = session.client_id.hostNameAnonymized;
                     session.client_id.macAddress = session.client_id.macAddressAnonymized;
                 });
-                res.json({sessions: sessions, reqId: reqId});
+                res.json({ sessions: sessions, reqId: reqId });
             }
         });
 
