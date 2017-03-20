@@ -18,7 +18,7 @@ module.exports = function () {
             session.update({ updated: false }, function (err) {
                 done++;
                 if (err) console.error("\x1b[31mERROR\x1b[0m:", "Unable to update session " + session._id);
-                if (done == sessions.length) console.log("---- Init ACS open turn : process ended ----");
+                if (done == sessions.length) console.info("\x1b[32minfo\x1b[0m:", "---- Init ACS open turn : process ended ----");
             });
         })
     });
