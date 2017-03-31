@@ -44,7 +44,7 @@ module.exports.apiRequest = function (vpcUrl, accessToken, path, callback) {
                     callback(null, result.data);
                     break;
                 default:
-                    console.error("\x1b[31mRESPONSE ERROR\x1b[0m:", JSON.stringify(error));
+                    console.error("\x1b[31mRESPONSE ERROR\x1b[0m:", JSON.stringify(result.error));
                     callback(result.error, result.data);
                     break;
 
