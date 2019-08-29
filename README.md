@@ -1,3 +1,6 @@
+# NO LONGER MAINTAINED
+As of August 30, 2019 this project is no longer maintained. It should still (probably) work, but I am no longer providing support, fixing issues, or adding new features.
+
 # Attendance
 This free Reference App is built to provide a use case example of the Aerohive APIs.
 This App is providing a simple view of the connections history of users. All the data are anonymized in this case.
